@@ -32,7 +32,7 @@ while read line; do
 	sed 's/^\([^\.]*\).*$/\1./' <<< "$line" | tr -d '\n'
 	genoutput=$(sentences "$line" $sourceone)
 	# Emulate the esteemed style of our original author:
-	sed "s/through/thro'/g;s/ful\([^l]\)/full\1/g;s/\band\b/\&/g" <<< "$genoutput"
+	sed "s/through/thro'/g;s/ful\([^l]\)/full\1/g;s/\band\b/\&/g;s/ie/ei/g" <<< "$genoutput"
         sed 's/^[^\.]*\.\(.*\)$/\1/' <<< "$line"
     else
         sed 's/NOVEL/GENERATED NOVEL/
