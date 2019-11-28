@@ -23,16 +23,26 @@ sentences () {
         echo "$sentences"
 }
 
+# replace words from $1 with words in $2 file
+replace () {
+	out=$1
+        for w in $(egrep -o "\w[a-z]{$3,}" <<< $1| grep -vi cassandra | shuf -n210); do
+		out=$(sed "s/$w/$(egrep -o "\w[a-z]{$4,}" $2 | shuf -n1)/g" <<< $out)
+	done
+	echo "$out"
+}
+
 ###
 # For each line in seed text, rewrite if a chapter:
 
 while read line; do
     if [ $(wc -m <<< "$line") -gt 40 ]; then
-        echo '[MODIFIED:] '
+	line=$(sed "s/----/$(egrep -o "\w[a-z]{7,}" $sourceone | shuf -n1)/g" <<< $line)
+        genoutput=$(replace "$(sentences "$line" $sourceone)" data/cassandra.txt 4 4)
+	line=$(replace "$line" $sourceone 7 7)
 	sed 's/^\([^\.]*\).*$/\1./' <<< "$line" | tr -d '\n'
-	genoutput=$(sentences "$line" $sourceone)
 	# Emulate the esteemed style of our original author:
-	sed "s/through/thro'/g;s/ful\([^l]\)/full\1/g;s/\band\b/\&/g;s/ie/ei/g" <<< "$genoutput"
+	sed "s/through/thro'/g;s/ful\([^l]\)/full\1/g;s/\band\b/\&/g;s/ien/ein/g" <<< "$genoutput"
         sed 's/^[^\.]*\.\(.*\)$/\1/' <<< "$line"
     else
         sed 's/NOVEL/GENERATED NOVEL/
